@@ -1,0 +1,5 @@
+use App\Http\Controllers\EvaluationController;
+
+    // Evaluations
+    Route::post('/evaluations', [EvaluationController::class, 'store'])->middleware('role:etudiant');
+    Route::get('/sessions/{session_id}/evaluations', [EvaluationController::class, 'showSessionEvaluations']);

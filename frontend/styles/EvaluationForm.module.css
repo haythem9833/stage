@@ -1,0 +1,284 @@
+.evaluationContainer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.header h2 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  margin: 0 0 1.5rem 0;
+  opacity: 0.95;
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #4CAF50;
+  transition: width 0.3s ease;
+}
+
+.form {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #667eea;
+}
+
+.description {
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0.5rem 0 1.5rem 0;
+  font-style: italic;
+}
+
+.formatterName {
+  color: #555;
+  margin: 1rem 0;
+  font-size: 1rem;
+}
+
+.formatterName strong {
+  color: #667eea;
+}
+
+.scaleRating {
+  margin: 1.5rem 0;
+}
+
+.ratingLabel {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.ratingOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.ratingButton {
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.ratingButton:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+}
+
+.ratingButton.active {
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.ratingValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.ratingText {
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+  margin: 0.5rem 0;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.error {
+  color: #F44336;
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.summary {
+  font-size: 1rem;
+  color: #333;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.summaryList {
+  list-style: none;
+  padding: 0;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0;
+}
+
+.summaryList li {
+  padding: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+}
+
+.summaryList li:last-child {
+  border-bottom: none;
+}
+
+.summaryList span {
+  font-weight: 600;
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.buttonPrimary,
+.buttonSecondary,
+.buttonSuccess,
+.buttonDanger {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.buttonPrimary {
+  background: #667eea;
+  color: white;
+}
+
+.buttonPrimary:hover:not(:disabled) {
+  background: #5568d3;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.buttonSecondary {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.buttonSecondary:hover:not(:disabled) {
+  background: #d0d0d0;
+}
+
+.buttonSuccess {
+  background: #4CAF50;
+  color: white;
+}
+
+.buttonSuccess:hover:not(:disabled) {
+  background: #45a049;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.buttonDanger {
+  background: #f44336;
+  color: white;
+}
+
+.buttonDanger:hover:not(:disabled) {
+  background: #da190b;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .evaluationContainer {
+    padding: 1rem;
+  }
+
+  .form {
+    padding: 1rem;
+  }
+
+  .header h2 {
+    font-size: 1.5rem;
+  }
+
+  .ratingOptions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+  }
+
+  .buttonPrimary,
+  .buttonSecondary,
+  .buttonSuccess,
+  .buttonDanger {
+    width: 100%;
+  }
+}

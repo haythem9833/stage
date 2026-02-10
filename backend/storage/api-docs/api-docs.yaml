@@ -1,0 +1,638 @@
+openapi: 3.0.0
+info:
+  title: CNI Formation API
+  version: 1.0.0
+  description: API de gestion des formations du CNI
+  contact:
+    name: Support
+    email: support@cni.com
+servers:
+  - url: http://localhost:8000
+    description: Local API Server
+paths:
+  /api/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nom, prenom, email, password, password_confirmation]
+              properties:
+                nom:
+                  type: string
+                prenom:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                password_confirmation:
+                  type: string
+                  format: password
+                role:
+                  type: string
+                  enum: [etudiant, formateur, admin]
+      responses:
+        201:
+          description: User created successfully
+        422:
+          description: Validation error
+
+  /api/login:
+    post:
+      tags:
+        - Auth
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        200:
+          description: Login successful
+        401:
+          description: Unauthorized
+
+  /api/profile:
+    get:
+      tags:
+        - Auth
+      summary: Get user profile
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: User profile retrieved
+        401:
+          description: Unauthenticated
+
+  /api/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout user
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: Logout successful
+        401:
+          description: Unauthenticated
+
+  /api/change-password:
+    post:
+      tags:
+        - Auth
+      summary: Change user password
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, new_password]
+              properties:
+                current_password:
+                  type: string
+                  format: password
+                new_password:
+                  type: string
+                  format: password
+      responses:
+        200:
+          description: Password changed successfully
+        401:
+          description: Unauthenticated
+
+  /api/formations:
+    get:
+      tags:
+        - Formations
+      summary: Get all formations
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: Formations list retrieved
+    post:
+      tags:
+        - Formations
+      summary: Create a new formation
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [titre, description, duree]
+              properties:
+                titre:
+                  type: string
+                description:
+                  type: string
+                duree:
+                  type: integer
+      responses:
+        201:
+          description: Formation created
+
+  /api/formations/{id}:
+    get:
+      tags:
+        - Formations
+      summary: Get a formation by ID
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Formation retrieved
+        404:
+          description: Formation not found
+    put:
+      tags:
+        - Formations
+      summary: Update a formation
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Formation updated
+    delete:
+      tags:
+        - Formations
+      summary: Delete a formation
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Formation deleted
+
+  /api/sessions:
+    get:
+      tags:
+        - Sessions
+      summary: Get all sessions
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: Sessions list retrieved
+    post:
+      tags:
+        - Sessions
+      summary: Create a new session
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        201:
+          description: Session created
+
+  /api/sessions/{id}:
+    get:
+      tags:
+        - Sessions
+      summary: Get a session by ID
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Session retrieved
+    put:
+      tags:
+        - Sessions
+      summary: Update a session
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Session updated
+    delete:
+      tags:
+        - Sessions
+      summary: Delete a session
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Session deleted
+
+  /api/sessions/{id}/validate:
+    post:
+      tags:
+        - Sessions
+      summary: Validate a session
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Session validated
+
+  /api/sessions/{id}/terminate:
+    post:
+      tags:
+        - Sessions
+      summary: Terminate a session
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Session terminated
+
+  /api/inscriptions:
+    get:
+      tags:
+        - Inscriptions
+      summary: Get all inscriptions (admin only)
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: Inscriptions list retrieved
+    post:
+      tags:
+        - Inscriptions
+      summary: Create a new inscription
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        201:
+          description: Inscription created
+
+  /api/inscriptions/{id}:
+    get:
+      tags:
+        - Inscriptions
+      summary: Get an inscription by ID
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Inscription retrieved
+    put:
+      tags:
+        - Inscriptions
+      summary: Update an inscription
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Inscription updated
+    delete:
+      tags:
+        - Inscriptions
+      summary: Delete an inscription
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Inscription deleted
+
+  /api/my-inscriptions:
+    get:
+      tags:
+        - Inscriptions
+      summary: Get current user inscriptions
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: User inscriptions retrieved
+
+  /api/inscriptions/{id}/validate:
+    post:
+      tags:
+        - Inscriptions
+      summary: Validate an inscription
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Inscription validated
+
+  /api/inscriptions/{id}/cancel:
+    post:
+      tags:
+        - Inscriptions
+      summary: Cancel an inscription
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Inscription cancelled
+
+  /api/certificats:
+    get:
+      tags:
+        - Certificats
+      summary: Get all certificats (admin only)
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: Certificats list retrieved
+    post:
+      tags:
+        - Certificats
+      summary: Create a certificat
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        201:
+          description: Certificat created
+
+  /api/certificats/{id}:
+    get:
+      tags:
+        - Certificats
+      summary: Get a certificat by ID
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Certificat retrieved
+    delete:
+      tags:
+        - Certificats
+      summary: Delete a certificat
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Certificat deleted
+
+  /api/my-certificats:
+    get:
+      tags:
+        - Certificats
+      summary: Get current user certificats
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: User certificats retrieved
+
+  /api/certificats/{id}/generate:
+    post:
+      tags:
+        - Certificats
+      summary: Generate a certificat
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        201:
+          description: Certificat generated
+
+  /api/certificats/{id}/download:
+    get:
+      tags:
+        - Certificats
+      summary: Download a certificat
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Certificat downloaded
+
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: Users list retrieved
+    post:
+      tags:
+        - Users
+      summary: Create a new user
+      security:
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        201:
+          description: User created
+
+  /api/users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get a user by ID
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: User retrieved
+    put:
+      tags:
+        - Users
+      summary: Update a user
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: User updated
+    delete:
+      tags:
+        - Users
+      summary: Delete a user
+      security:
+        - bearer: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: User deleted
+
+  /api/stats:
+    get:
+      tags:
+        - Dashboard
+      summary: Get global statistics
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: Statistics retrieved
+
+  /api/admin/dashboard:
+    get:
+      tags:
+        - Dashboard
+      summary: Get dashboard overview
+      security:
+        - bearer: []
+      responses:
+        200:
+          description: Dashboard data retrieved
+
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Login with Bearer token

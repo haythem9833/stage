@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Complete-All API</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .result { background: #f0f0f0; padding: 10px; margin-top: 10px; border-radius: 5px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Test Complete-All API</h1>
+    
+    <div>
+        <label>Token JWT (du localStorage):</label>
+        <input type="text" id="token" style="width: 100%; height: 100px;" placeholder="Collez votre token ici">
+    </div>
+    
+    <div>
+        <label>Formation ID:</label>
+        <input type="number" id="formationId" value="9" />
+    </div>
+    
+    <button onclick="testAPI()">Tester l'API</button>
+    
+    <div id="result" class="result" style="display:none;"></div>
+    
+    <script>
+        async function testAPI() {
+            const token = document.getElementById('token').value;
+            const formationId = document.getElementById('formationId').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!token) {
+                resultDiv.innerHTML = '<span class="error">Erreur: Token non fourni</span>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/formations/${formationId}/complete-all`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <span class="success"><strong>Succès!</strong></span>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <span class="error"><strong>Erreur (${response.status}):</strong></span>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <span class="error"><strong>Erreur réseau:</strong></span>
+                    <pre>${error.message}</pre>
+                `;
+                resultDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
