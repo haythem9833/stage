@@ -4,7 +4,7 @@ import PrivateRoute from "../../components/PrivateRoute";
 import FormationsTable from "../../components/tables/FormationsTable";
 import FormationCreateModal from "../../components/modals/FormationCreateModal";
 import { AuthContext } from "../../context/AuthContext";
-import { createFormation, deleteFormation, getFormations, updateFormation, completeFormation } from "../../services/api";
+import { createFormation, deleteFormation, getFormations, updateFormation, completeFormation, startFormation } from "../../services/api";
 
 import {
 BookOpen,
@@ -33,6 +33,7 @@ const [editingFormation, setEditingFormation] = useState(null);
 const [submitting, setSubmitting] = useState(false);
 const [deletingId, setDeletingId] = useState(null);
 const [completingId, setCompletingId] = useState(null);
+const [startingId, setStartingId] = useState(null);
 
 const myFormations = useMemo(() => {
 const myId = user?.id;
@@ -56,8 +57,8 @@ return filtered;
 const stats = useMemo(() => {
 return {
 total: myFormations.length,
-totalInscrits: myFormations.reduce((acc, f) => acc + (f.inscrits || 0), 0),
-totalSessions: myFormations.reduce((acc, f) => acc + (f.sessions?.length || 0), 0),
+totalInscrits: myFormations.reduce((acc, f) => acc + (f.inscriptions?.length || 0), 0),
+totalSessions: myFormations.reduce((acc, f) => acc + (f.inscriptions?.length || 0), 0),
 totalModules: myFormations.reduce((acc, f) => acc + (f.modules || 0), 0),
 };
 }, [myFormations]);
@@ -178,6 +179,23 @@ setCompletingId(null);
 }
 };
 
+const handleStartFormation = async (id) => {
+if (!confirm("Êtes-vous sûr de vouloir commencer cette formation ? La prise de présence deviendra active.")) return;
+try {
+setStartingId(id);
+setError(null);
+await startFormation(id);
+setSuccess("Formation démarrée avec succès ! Prise de présence activée.");
+await fetchFormations();
+setTimeout(() => setSuccess(null), 3000);
+} catch (err) {
+console.error("Erreur démarrage formation:", err);
+setError(err.response?.data?.message || "Impossible de démarrer la formation");
+} finally {
+setStartingId(null);
+}
+};
+
 return (
 <PrivateRoute roles={["formateur"]}>
 <div className="formateur-formations-page">
@@ -249,7 +267,7 @@ return (
 </div>
 <div className="stat-content">
 <span className="stat-value">{stats.totalSessions}</span>
-<span className="stat-label">Sessions</span>
+<span className="stat-label">Inscrits</span>
 </div>
 </div>
 <div className="stat-card stat-card-green">
@@ -299,8 +317,10 @@ formations={myFormations}
 onEdit={handleEditFormation}
 onDelete={handleDeleteFormation}
 onComplete={handleCompleteFormation}
+onStart={handleStartFormation}
 deletingId={deletingId}
 completingId={completingId}
+startingId={startingId}
 />
 </div>
 )}

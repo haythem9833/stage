@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import PrivateRoute from "../../components/PrivateRoute";
-import { getFormationsSessions, getFormateursInscriptions, getFormateurssCertificats } from "../../services/api";
+import { getFormationsSessions, getFormateursInscriptions } from "../../services/api";
 import {
   BookOpen,
   FileText,
@@ -23,7 +23,6 @@ import {
   Settings,
   CheckCircle,
   Users as UsersIcon,
-  Star,
 } from "lucide-react";
 
 export default function FormateurDashboard() {
@@ -31,7 +30,6 @@ export default function FormateurDashboard() {
   const [stats, setStats] = useState({
     sessions: 0,
     inscriptions: 0,
-    certificats: 0,
     participantsTotal: 0,
     sessionsActives: 0,
     tauxCompletion: 0,
@@ -50,15 +48,13 @@ export default function FormateurDashboard() {
     try {
       setLoading(true);
 
-      const [sessions, inscriptions, certificats] = await Promise.all([
+      const [sessions, inscriptions] = await Promise.all([
         getFormationsSessions(),
         getFormateursInscriptions(),
-        getFormateurssCertificats(),
       ]);
 
       const sessionsData = sessions.data || [];
       const inscriptionsData = inscriptions.data || [];
-      const certificatsData = certificats.data || [];
 
       // Calculate additional stats
       const participantsTotal = sessionsData.reduce((acc, s) => acc + (s.inscrits || 0), 0);
@@ -76,7 +72,6 @@ export default function FormateurDashboard() {
       setStats({
         sessions: sessionsData.length,
         inscriptions: inscriptionsData.length,
-        certificats: certificatsData.length,
         participantsTotal,
         sessionsActives,
         tauxCompletion,
@@ -269,31 +264,15 @@ export default function FormateurDashboard() {
               </button>
 
               <button
-                className="quick-action-card action-green"
-                onClick={() => handleQuickAction("/formateur/inscriptions")}
+                className="quick-action-card action-orange"
+                onClick={() => handleQuickAction("/formateur/presences")}
               >
                 <div className="action-icon">
-                  <FileText />
+                  <Clock />
                 </div>
                 <div className="action-content">
-                  <h3>Inscriptions</h3>
-                  <p>Suivez les inscriptions à vos sessions</p>
-                </div>
-                <div className="action-arrow">
-                  <ArrowRight />
-                </div>
-              </button>
-
-              <button
-                className="quick-action-card action-rose"
-                onClick={() => handleQuickAction("/formateur/evaluations")}
-              >
-                <div className="action-icon">
-                  <Star />
-                </div>
-                <div className="action-content">
-                  <h3>Résultats d'Évaluation</h3>
-                  <p>Consultez les évaluations des étudiants</p>
+                  <h3>Présences</h3>
+                  <p>Enregistrez et consultez les présences</p>
                 </div>
                 <div className="action-arrow">
                   <ArrowRight />
@@ -749,6 +728,17 @@ export default function FormateurDashboard() {
 
         .quick-action-card.action-rose .action-icon {
           background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+          color: white;
+        }
+
+        .quick-action-card.action-red:hover {
+          border-color: #ef4444;
+          background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+          transform: translateX(4px);
+        }
+
+        .quick-action-card.action-red .action-icon {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
           color: white;
         }
 

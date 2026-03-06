@@ -26,14 +26,12 @@ export default function Profil() {
   const [errors, setErrors] = useState({});
 
   // Preferences state
-  const [preferences, setPreferences] = useState(
-    user.preferences || {
-      emailNotifications: true,
-      pushNotifications: false,
-      weeklyDigest: true,
-      language: "fr",
-    }
-  );
+  const [preferences, setPreferences] = useState({
+    emailNotifications: true,
+    pushNotifications: false,
+    weeklyDigest: true,
+    language: "fr",
+  });
 
   // Mock activity data
   const mockActivities = [
@@ -70,6 +68,13 @@ export default function Profil() {
   useEffect(() => {
     setIsHydrated(true);
   }, []);
+
+  // Update preferences when user loads
+  useEffect(() => {
+    if (user?.preferences) {
+      setPreferences(user.preferences);
+    }
+  }, [user]);
 
   if (!isHydrated || !user) {
     return (

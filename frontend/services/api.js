@@ -41,6 +41,7 @@ export const getFormation = (id) => api.get(`/formations/${id}`);
 export const createFormation = (data) => api.post("/formations", data);
 export const updateFormation = (id, data) => api.put(`/formations/${id}`, data);
 export const deleteFormation = (id) => api.delete(`/formations/${id}`);
+export const startFormation = (id) => api.post(`/formations/${id}/start`);
 export const completeFormation = (id) => api.post(`/formations/${id}/complete-all`);
 
 // --- SESSIONS ---
@@ -90,5 +91,34 @@ export const getDashboard = () => api.get("/admin/dashboard");
 export const getFormationsSessions = () => api.get("/formateur/sessions");
 export const getFormateursInscriptions = () => api.get("/formateur/inscriptions");
 export const getFormateurssCertificats = () => api.get("/formateur/certificats");
+
+// --- PRESENCES (now linked to formations, not sessions) ---
+export const getPresences = (formationId) => api.get(`/formations/${formationId}/presences`);
+export const getPresence = (id) => api.get(`/presences/${id}`);
+export const batchRecordPresences = (formationId, data) => 
+  api.post(`/formations/${formationId}/presences/batch`, data);
+export const getPresenceSynthese = (formationId) => api.get(`/formations/${formationId}/presences/synthese`);
+export const getAbsentByDate = (formationId, date) => 
+  api.get(`/formations/${formationId}/presences/absents-par-date?date=${date}`);
+export const getAbsentTotal = (formationId) => api.get(`/formations/${formationId}/presences/absents-total`);
+export const justifyAbsence = (presenceId, data) => api.put(`/presences/${presenceId}/justifier`, data);
+
+// --- V2.0 DASHBOARD (ADMIN) ---
+export const getDashboardStats = () => api.get("/admin/dashboard-v2/stats");
+export const getFormationsStats = () => api.get("/admin/dashboard-v2/formations-stats");
+export const getPresencesStats = () => api.get("/admin/dashboard-v2/presences-stats");
+
+// --- V2.0 RAPPORTS & HISTORIQUE (PRIORITY 2) ---
+export const getMyHistory = () => api.get("/rapports/historique");
+export const getParticipantHistory = (id) => api.get(`/rapports/participants/${id}/historique`);
+export const getAllParticipantsHistory = (role = 'etudiant') => 
+  api.get(`/rapports/admin/participants-historique?role=${role}`);
+export const exportPresencesCSV = (formationId) => api.get(`/rapports/presences/export-csv?formation_id=${formationId}`);
+export const exportFormationsCSV = () => api.get("/rapports/formations/export-csv");
+export const exportInscriptionsCSV = (sessionId = null) => 
+  api.get(`/rapports/inscriptions/export-csv${sessionId ? `?session_id=${sessionId}` : ""}`);
+export const getSessionBilan = (id) => api.get(`/rapports/bilan-session/${id}`);
+export const getPeriodBilan = (dateDebut, dateFin) => 
+  api.get(`/rapports/bilan-periode?date_debut=${dateDebut}&date_fin=${dateFin}`);
 
 export default api;

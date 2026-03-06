@@ -78,8 +78,8 @@ export default function AdminFormations() {
 
   const stats = {
     total: formations.length,
-    totalInscrits: formations.reduce((acc, f) => acc + (f.inscrits || 0), 0),
-    totalSessions: formations.reduce((acc, f) => acc + (f.sessions?.length || 0), 0),
+    totalInscrits: formations.reduce((acc, f) => acc + (f.inscriptions?.length || 0), 0),
+    totalSessions: formations.reduce((acc, f) => acc + (f.inscriptions?.length || 0), 0),
     totalFormateurs: formateurs.length,
     published: formations.filter((f) => f.statut === "publie").length,
     drafts: formations.filter((f) => f.statut === "brouillon").length,
@@ -337,7 +337,7 @@ export default function AdminFormations() {
             </div>
             <div className="stat-content">
               <span className="stat-value">{stats.totalSessions}</span>
-              <span className="stat-label">Sessions</span>
+              <span className="stat-label">Inscrits</span>
             </div>
           </div>
           <div className="stat-card stat-card-indigo">

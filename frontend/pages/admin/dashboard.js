@@ -5,7 +5,6 @@ import PrivateRoute from "../../components/PrivateRoute";
 import {
   getUsers,
   getFormations,
-  getSessions,
   getInscriptions,
   getCertificats,
   getRoleRequests,
@@ -36,7 +35,6 @@ import {
   Lock,
   ShieldAlert,
   Edit,
-  Star,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -71,14 +69,12 @@ export default function AdminDashboard() {
       const [
         users,
         formations,
-        sessions,
         inscriptions,
         certificats,
         roleRequests,
       ] = await Promise.all([
         getUsers(),
         getFormations(),
-        getSessions(),
         getInscriptions(),
         getCertificats(),
         getRoleRequests().catch((e) => ({ data: [] })),
@@ -86,30 +82,29 @@ export default function AdminDashboard() {
 
       const usersData = users.data || [];
       const formationsData = formations.data || [];
-      const sessionsData = sessions.data || [];
       const inscriptionsData = inscriptions.data || [];
       const certificatsData = certificats.data || [];
       const roleRequestsData = roleRequests.data || [];
 
       const formateurs = usersData.filter((u) => u.role === "formateur");
       const etudiants = usersData.filter((u) => u.role === "etudiant");
-      const sessionsActives = sessionsData.filter((s) => s.statut === "active");
+      const formationsActives = formationsData.filter((f) => f.date_debut && new Date(f.date_debut) <= new Date());
       const formationsPubliees = formationsData.filter((f) => f.statut === "publie");
       const formationsBrouillon = formationsData.filter((f) => f.statut === "brouillon");
-      const upcoming = sessionsData
-        .filter((s) => new Date(s.date) > new Date())
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
+      const upcoming = formationsData
+        .filter((f) => f.date_debut && new Date(f.date_debut) > new Date())
+        .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut))
         .slice(0, 4);
 
       setStats({
         users: usersData.length,
         formations: formationsData.length,
-        sessions: sessionsData.length,
+        sessions: formationsActives.length,
         inscriptions: inscriptionsData.length,
         certificats: certificatsData.length,
         formateurs: formateurs.length,
         etudiants: etudiants.length,
-        sessionsActives: sessionsActives.length,
+        sessionsActives: formationsActives.length,
         pendingRequests: roleRequestsData.length,
         formationsPubliees: formationsPubliees.length,
         formationsBrouillon: formationsBrouillon.length,
@@ -117,16 +112,10 @@ export default function AdminDashboard() {
 
       // Generate recent activities
       const activities = [
-        ...sessionsData.slice(0, 3).map((s) => ({
-          id: `session-${s.id}`,
-          type: "session",
-          title: `Session ${s.nom || "créée"}`,
-          date: s.created_at || new Date().toISOString(),
-        })),
-        ...formationsData.slice(0, 2).map((f) => ({
+        ...formationsData.slice(0, 5).map((f) => ({
           id: `formation-${f.id}`,
           type: "formation",
-          title: `Formation ${f.nom} ${f.statut === "publie" ? "publiée" : "créée"}`,
+          title: `Formation ${f.titre} ${f.statut === "publie" ? "publiée" : "créée"}`,
           date: f.created_at || new Date().toISOString(),
         })),
       ];
@@ -141,11 +130,11 @@ export default function AdminDashboard() {
           count: roleRequestsData.length,
         });
       }
-      if (sessionsActives.length > 10) {
+      if (formationsActives.length > 10) {
         alerts.push({
           type: "info",
-          message: `${sessionsActives.length} sessions actives`,
-          count: sessionsActives.length,
+          message: `${formationsActives.length} formations actives`,
+          count: formationsActives.length,
         });
       }
       if (formationsBrouillon.length > 3) {
@@ -446,15 +435,31 @@ export default function AdminDashboard() {
               </button>
 
               <button
-                className="quick-action-card action-rose"
-                onClick={() => handleQuickAction("/admin/evaluations")}
+                className="quick-action-card action-orange"
+                onClick={() => handleQuickAction("/admin/rapports")}
               >
                 <div className="action-icon">
-                  <Star />
+                  <BarChart3 />
                 </div>
                 <div className="action-content">
-                  <h3>Résultats d'Évaluation</h3>
-                  <p>Analysez les évaluations</p>
+                  <h3>Rapports</h3>
+                  <p>Exportez et analysez les données</p>
+                </div>
+                <div className="action-arrow">
+                  <ArrowRight />
+                </div>
+              </button>
+
+              <button
+                className="quick-action-card action-teal"
+                onClick={() => handleQuickAction("/admin/dashboard-v2")}
+              >
+                <div className="action-icon">
+                  <BarChart3 />
+                </div>
+                <div className="action-content">
+                  <h3>Statistiques Avancées</h3>
+                  <p>Métriques détaillées et analyses</p>
                 </div>
                 <div className="action-arrow">
                   <ArrowRight />
@@ -1090,6 +1095,18 @@ export default function AdminDashboard() {
           transform: translateX(4px);
         }
 
+        .quick-action-card.action-orange:hover {
+          border-color: #f97316;
+          background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+          transform: translateX(4px);
+        }
+
+        .quick-action-card.action-teal:hover {
+          border-color: #14b8a6;
+          background: linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%);
+          transform: translateX(4px);
+        }
+
         .action-icon {
           width: 48px;
           height: 48px;
@@ -1132,6 +1149,16 @@ export default function AdminDashboard() {
 
         .quick-action-card.action-rose .action-icon {
           background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+          color: white;
+        }
+
+        .quick-action-card.action-orange .action-icon {
+          background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+          color: white;
+        }
+
+        .quick-action-card.action-teal .action-icon {
+          background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
           color: white;
         }
 

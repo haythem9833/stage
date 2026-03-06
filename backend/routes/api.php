@@ -3,11 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FormationController;
-use App\Http\Controllers\SessionController;
 use App\Http\Controllers\InscriptionController;
 use App\Http\Controllers\CertificatController;
-use App\Http\Controllers\EvaluationController;
-use App\Http\Controllers\Api\EvaluationController as ApiEvaluationController;
+use App\Http\Controllers\Api\PresenceController;
+use App\Http\Controllers\Api\DashboardController as ApiDashboardController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\DashboardController;
 
 /*
@@ -36,17 +36,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/formations/{formation}', [FormationController::class, 'show']);
     Route::post('/formations', [FormationController::class, 'store'])->middleware('role:admin,formateur');
     Route::put('/formations/{formation}', [FormationController::class, 'update'])->middleware('role:admin,formateur');
+    Route::post('/formations/{formation}/start', [FormationController::class, 'start'])->middleware('role:admin,formateur');
     Route::post('/formations/{formation}/complete-all', [FormationController::class, 'completerTous'])->middleware('role:admin,formateur');
     Route::delete('/formations/{formation}', [FormationController::class, 'destroy'])->middleware('role:admin,formateur');
 
-    // Sessions - Lectures publiques, écritures admin/formateur
-    Route::get('/sessions', [SessionController::class, 'index']);
-    Route::get('/sessions/{id}', [SessionController::class, 'show']);
-    Route::post('/sessions', [SessionController::class, 'store'])->middleware('role:admin,formateur');
-    Route::put('/sessions/{id}', [SessionController::class, 'update'])->middleware('role:admin,formateur');
-    Route::delete('/sessions/{id}', [SessionController::class, 'destroy'])->middleware('role:admin');
-    Route::post('/sessions/{id}/validate', [SessionController::class, 'valider'])->middleware('role:admin,formateur');
-    Route::post('/sessions/{id}/terminate', [SessionController::class, 'terminer'])->middleware('role:admin,formateur');
+    // NOTE: Sessions have been merged into Formations (no more separate session management)
+    // Presences are now recorded directly on formations with automatic activation when date_debut <= today
 
     // Inscriptions
     Route::get('/inscriptions', [InscriptionController::class, 'index'])->middleware('role:admin');
@@ -67,22 +62,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/certificats/{id}/generate', [CertificatController::class, 'generer'])->middleware('role:admin,formateur');
     Route::get('/certificats/{id}/download', [CertificatController::class, 'download'])->middleware('role:admin,etudiant');
 
-    // Formations formateur
-    Route::get('/formateur/sessions', [SessionController::class, 'mesSessions'])->middleware('role:formateur');
-    Route::get('/formateur/inscriptions', [InscriptionController::class, 'mesFormationsInscriptions'])->middleware('role:formateur');
-
-    // Evaluations
-    Route::post('/evaluations', [EvaluationController::class, 'store'])->middleware('role:etudiant');
-    Route::get('/sessions/{session_id}/evaluations', [EvaluationController::class, 'showSessionEvaluations']);
-    
-    // New Evaluation API endpoints
-    Route::get('/evaluations/formations', [ApiEvaluationController::class, 'getFormationsForEvaluation'])->middleware('role:etudiant');
-    Route::get('/inscriptions/{inscription}/evaluation', [ApiEvaluationController::class, 'getEvaluation'])->middleware('role:etudiant');
-    Route::post('/inscriptions/{inscription}/evaluation/create', [ApiEvaluationController::class, 'createEvaluation'])->middleware('role:etudiant');
-    Route::put('/evaluations/{evaluation}', [ApiEvaluationController::class, 'updateEvaluation'])->middleware('role:etudiant');
-    Route::post('/evaluations/{evaluation}/submit', [ApiEvaluationController::class, 'submitEvaluation'])->middleware('role:etudiant');
-    Route::get('/formations/{formation}/evaluation-stats', [ApiEvaluationController::class, 'getFormationEvaluationStats'])->middleware('role:admin,formateur');
-
     // Utilisateurs
     Route::get('/users', [DashboardController::class, 'getUsers'])->middleware('role:admin');
     Route::get('/users/{id}', [DashboardController::class, 'getUser'])->middleware('role:admin');
@@ -90,7 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/users/{id}', [DashboardController::class, 'updateUser'])->middleware('role:admin');
     Route::delete('/users/{id}', [DashboardController::class, 'deleteUser'])->middleware('role:admin');
 
-    // Role requests approval (admin)
+    // Role upgrade requests (admin)
     Route::get('/admin/role-requests', [DashboardController::class, 'getPendingRoleRequests'])->middleware('role:admin');
     Route::post('/admin/role-requests/{id}/approve', [DashboardController::class, 'approveRoleRequest'])->middleware('role:admin');
     Route::post('/admin/role-requests/{id}/reject', [DashboardController::class, 'rejectRoleRequest'])->middleware('role:admin');
@@ -98,4 +77,42 @@ Route::middleware('auth:sanctum')->group(function () {
     // Statistiques
     Route::get('/stats', [DashboardController::class, 'getStats'])->middleware('role:admin');
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware('role:admin');
+
+    // PRESENCES - Now linked directly to formations (not sessions)
+    Route::get('/formations/{formationId}/presences', [PresenceController::class, 'index'])->middleware('role:admin,formateur');
+    Route::post('/formations/{formationId}/presences/batch', [PresenceController::class, 'batch'])->middleware('role:formateur,admin');
+    Route::get('/formations/{formationId}/presences/synthese', [PresenceController::class, 'synthese'])->middleware('role:admin,formateur');
+    Route::get('/formations/{formationId}/presences/feuille-presence', [PresenceController::class, 'feuillePresence'])->middleware('role:admin,formateur');
+    Route::get('/formations/{formationId}/presences/absents-par-date', [PresenceController::class, 'absentParDate'])->middleware('role:admin,formateur');
+    Route::get('/formations/{formationId}/presences/absents-total', [PresenceController::class, 'absentTotal'])->middleware('role:admin,formateur');
+
+    Route::prefix('presences')->group(function () {
+        Route::put('/{id}/justifier', [PresenceController::class, 'justifier'])->middleware('role:admin,formateur');
+        Route::post('/{id}/corriger', [PresenceController::class, 'corriger'])->middleware('role:admin,formateur');
+    });
+
+    Route::prefix('etudiants')->group(function () {
+        Route::get('/{id}/taux-presence', [PresenceController::class, 'tauxPresenceEtudiant']);
+    });
+
+    // DASHBOARD V2 (P1)
+    Route::prefix('admin/dashboard-v2')->group(function () {
+        Route::get('/stats', [ApiDashboardController::class, 'stats'])->middleware('role:admin');
+        Route::get('/formations-stats', [ApiDashboardController::class, 'formationsStats'])->middleware('role:admin');
+        Route::get('/presences-stats', [ApiDashboardController::class, 'presencesStats'])->middleware('role:admin');
+    });
+
+    // RAPPORTS & HISTORIQUE (P2)
+    Route::prefix('rapports')->group(function () {
+        Route::get('/historique', [ReportController::class, 'getMyHistory']);
+        Route::get('/participants/{id}/historique', [ReportController::class, 'getParticipantHistory'])->middleware('role:admin,formateur');
+        Route::get('/admin/participants-historique', [ReportController::class, 'getAllParticipantsHistory'])->middleware('role:admin');
+        Route::get('/presences/export-csv', [ReportController::class, 'exportPresencesCSV'])->middleware('role:admin,formateur');
+        Route::get('/formations/export-csv', [ReportController::class, 'exportFormationsCSV'])->middleware('role:admin');
+        Route::get('/inscriptions/export-csv', [ReportController::class, 'exportInscriptionsCSV'])->middleware('role:admin,formateur');
+        Route::get('/bilan-session/{id}', [ReportController::class, 'getSessionBilan'])->middleware('role:admin,formateur');
+        Route::get('/bilan-periode', [ReportController::class, 'getPeriodBilan'])->middleware('role:admin');
+    });
+
+    Route::get('/historique', [ReportController::class, 'getMyHistory']);
 });

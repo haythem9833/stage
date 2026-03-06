@@ -18,7 +18,6 @@ import {
   BarChart3,
   RefreshCw,
   User,
-  Star,
 } from "lucide-react";
 
 export default function EtudiantDashboard() {
@@ -301,22 +300,6 @@ export default function EtudiantDashboard() {
                 <div className="action-content">
                   <h3>Mes Certificats</h3>
                   <p>Consultez vos certificats obtenus</p>
-                </div>
-                <div className="action-arrow">
-                  <ArrowRight />
-                </div>
-              </button>
-
-              <button
-                className="quick-action-card action-rose"
-                onClick={() => handleQuickAction("/etudiant/evaluations")}
-              >
-                <div className="action-icon">
-                  <Star />
-                </div>
-                <div className="action-content">
-                  <h3>Évaluations</h3>
-                  <p>Évaluez vos formations complétées</p>
                 </div>
                 <div className="action-arrow">
                   <ArrowRight />

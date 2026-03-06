@@ -10,16 +10,19 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up()
-{
-    Schema::create('users', function (Blueprint $table) {
-        $table->id();
-        $table->string('nom');
-        $table->string('prenom');
-        $table->string('email')->unique();
-        $table->string('password');
-        $table->enum('role', ['etudiant', 'formateur', 'admin'])->default('etudiant');
-        $table->timestamps();
-    });
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->nullable();  // Compatible with Laravel factories
+            $table->string('nom')->nullable();   // French version kept for legacy
+            $table->string('prenom')->nullable(); // French version kept for legacy
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->string('remember_token')->nullable();
+            $table->enum('role', ['etudiant', 'formateur', 'admin'])->default('etudiant');
+            $table->timestamps();
+        });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

@@ -15,7 +15,6 @@ class Certificat extends Model
     protected $fillable = [
         'etudiant_id',
         'formation_id',
-        'session_formation_id',
         'numero_certificat',
         'date_emission',
         'chemin_fichier',
@@ -43,13 +42,5 @@ class Certificat extends Model
     public function formation(): BelongsTo
     {
         return $this->belongsTo(Formation::class, 'formation_id');
-    }
-
-    /**
-     * Session associée
-     */
-    public function session(): BelongsTo
-    {
-        return $this->belongsTo(SessionFormation::class, 'session_formation_id');
     }
 }

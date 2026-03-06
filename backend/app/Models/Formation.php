@@ -47,19 +47,19 @@ class Formation extends Model
     }
 
     /**
+     * Presences pour cette formation
+     */
+    public function presences(): HasMany
+    {
+        return $this->hasMany(Presence::class);
+    }
+
+    /**
      * Évaluations
      */
     public function evaluations(): HasMany
     {
         return $this->hasMany(Evaluation::class);
-    }
-
-    /**
-     * Sessions (deprecated - kept for compatibility)
-     */
-    public function sessions(): HasMany
-    {
-        return $this->hasMany(SessionFormation::class, 'formation_id');
     }
 
     /**

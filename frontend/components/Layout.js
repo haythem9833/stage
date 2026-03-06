@@ -84,6 +84,12 @@ export default function Layout({ children, role }) {
                     </div>
                     Dashboard
                   </Link>
+                  <Link href="/admin/dashboard-v2" className="nav-link">
+                    <div className="sb-nav-link-icon">
+                      <i className="fas fa-chart-bar"></i>
+                    </div>
+                    Dashboard V2
+                  </Link>
                   <Link href="/admin/formations" className="nav-link">
                     <div className="sb-nav-link-icon">
                       <i className="fas fa-book"></i>
@@ -96,6 +102,18 @@ export default function Layout({ children, role }) {
                     </div>
                     Utilisateurs
                   </Link>
+                  <Link href="/admin/rapports" className="nav-link">
+                    <div className="sb-nav-link-icon">
+                      <i className="fas fa-file-csv"></i>
+                    </div>
+                    Rapports
+                  </Link>
+                  <Link href="/admin/role-requests" className="nav-link">
+                    <div className="sb-nav-link-icon">
+                      <i className="fas fa-check-circle"></i>
+                    </div>
+                    Demandes de Rôle
+                  </Link>
                 </>
               )}
 
@@ -107,17 +125,29 @@ export default function Layout({ children, role }) {
                     </div>
                     Dashboard
                   </Link>
-                  <Link href="/formateur/mes-formations" className="nav-link">
+                  <Link href="/formateur/formations" className="nav-link">
                     <div className="sb-nav-link-icon">
                       <i className="fas fa-book"></i>
                     </div>
                     Mes Formations
                   </Link>
-                  <Link href="/formateur/etudiants" className="nav-link">
+                  <Link href="/formateur/presences" className="nav-link">
                     <div className="sb-nav-link-icon">
-                      <i className="fas fa-users"></i>
+                      <i className="fas fa-user-check"></i>
                     </div>
-                    Étudiants
+                    Présences
+                  </Link>
+                  <Link href="/formateur/planning" className="nav-link">
+                    <div className="sb-nav-link-icon">
+                      <i className="fas fa-calendar-alt"></i>
+                    </div>
+                    Planning
+                  </Link>
+                  <Link href="/formateur/certificats" className="nav-link">
+                    <div className="sb-nav-link-icon">
+                      <i className="fas fa-certificate"></i>
+                    </div>
+                    Certificats
                   </Link>
                 </>
               )}

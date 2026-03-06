@@ -1,4 +1,4 @@
-export default function FormationsTable({ formations, onEdit, onDelete, onComplete, completingId }) {
+export default function FormationsTable({ formations, onEdit, onDelete, onComplete, onStart, completingId, startingId }) {
   return (
     <div className="table-container">
       <table>
@@ -8,6 +8,7 @@ export default function FormationsTable({ formations, onEdit, onDelete, onComple
             <th>Titre</th>
             <th>Description</th>
             <th>Durée</th>
+            <th>Statut</th>
             <th>Formateur</th>
             <th>Actions</th>
           </tr>
@@ -15,7 +16,7 @@ export default function FormationsTable({ formations, onEdit, onDelete, onComple
         <tbody>
           {formations.length === 0 ? (
             <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>
+              <td colSpan="7" style={{ textAlign: "center" }}>
                 Aucune formation trouvée
               </td>
             </tr>
@@ -27,6 +28,11 @@ export default function FormationsTable({ formations, onEdit, onDelete, onComple
                 <td>{formation.description ? `${formation.description.substring(0, 50)}...` : "-"}</td>
                 <td>{formation.duree}h</td>
                 <td>
+                  <span className={`status-badge status-${formation.statut || 'en_attente'}`}>
+                    {formation.statut || 'En attente'}
+                  </span>
+                </td>
+                <td>
                   {formation.formateur && typeof formation.formateur === 'object'
                     ? `${formation.formateur.prenom ?? ""} ${formation.formateur.nom ?? ""}`.trim() || "-"
                     : formation.formateur_id
@@ -34,6 +40,16 @@ export default function FormationsTable({ formations, onEdit, onDelete, onComple
                       : "-"}
                 </td>
                 <td>
+                  {formation.statut !== 'en_cours' && formation.statut !== 'terminee' && (
+                    <button
+                      className="btn-start"
+                      onClick={() => onStart(formation.id)}
+                      title="Commencer la formation"
+                      disabled={startingId === formation.id}
+                    >
+                      {startingId === formation.id ? "..." : "▶️"}
+                    </button>
+                  )}
                   <button
                     className="btn-edit"
                     onClick={() => onEdit(formation)}
@@ -41,14 +57,16 @@ export default function FormationsTable({ formations, onEdit, onDelete, onComple
                   >
                     ✏️
                   </button>
-                  <button
-                    className="btn-complete"
-                    onClick={() => onComplete(formation.id)}
-                    title="Terminer la formation"
-                    disabled={completingId === formation.id}
-                  >
-                    {completingId === formation.id ? "..." : "✓"}
-                  </button>
+                  {formation.statut === 'en_cours' && (
+                    <button
+                      className="btn-complete"
+                      onClick={() => onComplete(formation.id)}
+                      title="Terminer la formation et générer certificats"
+                      disabled={completingId === formation.id}
+                    >
+                      {completingId === formation.id ? "..." : "✓"}
+                    </button>
+                  )}
                   <button
                     className="btn-delete"
                     onClick={() => onDelete(formation.id)}
@@ -87,14 +105,37 @@ export default function FormationsTable({ formations, onEdit, onDelete, onComple
         tr:hover {
           background-color: #f8f9fa;
         }
+        .status-badge {
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+        .status-en_attente {
+          background-color: #e2e3e5;
+          color: #383d41;
+        }
+        .status-en_cours {
+          background-color: #d1ecf1;
+          color: #0c5460;
+        }
+        .status-terminee {
+          background-color: #d4edda;
+          color: #155724;
+        }
         .btn-edit,
         .btn-delete,
-        .btn-complete {
+        .btn-complete,
+        .btn-start {
           background: none;
           border: none;
           font-size: 18px;
           cursor: pointer;
           margin-right: 10px;
+        }
+        .btn-start:hover:not(:disabled) {
+          transform: scale(1.2);
         }
         .btn-edit:hover {
           transform: scale(1.2);
@@ -105,7 +146,8 @@ export default function FormationsTable({ formations, onEdit, onDelete, onComple
         .btn-delete:hover {
           transform: scale(1.2);
         }
-        .btn-complete:disabled {
+        .btn-complete:disabled,
+        .btn-start:disabled {
           opacity: 0.6;
           cursor: not-allowed;
         }
